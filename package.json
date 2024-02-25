@@ -1,0 +1,24 @@
+{
+  "name": "cle-project",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "compile": "cle compile",
+    "setup": "cle setup",
+    "exec": "cle exec",
+    "prove": "cle prove",
+    "upload": "cle upload",
+    "deploy": "cle deploy",
+    "verify": "cle verify",
+    "publish": "cle publish",
+    "deposit": "cle deposit"
+  },
+  "dependencies": {
+    "@ora-io/cle-lib": "^1.0.1-alpha.4"
+  },
+  "devDependencies": {
+    "@ora-io/cle-cli": "1.0.0-alpha.12",
+    "assemblyscript": "^0.27.0"
+  }
+}

@@ -1,36 +1,28 @@
 //@ts-ignore
-import { require } from "@ora-io/cle-lib";
-import { Bytes, Block, Event } from "@ora-io/cle-lib";
+import { Bytes, Block, Event, Address, require } from "@ora-io/cle-lib";
 
-let addr = Bytes.fromHexString('0xa60ecf32309539dd84f27a9563754dca818b815e');
-let esig_sync = Bytes.fromHexString("0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1");
+let addr = Bytes.fromHexString("0x9Dab03Dd319a7b956C433A20218C7e5008CD3bCa");
+let esig_countChanged = Bytes.fromHexString(
+  "0x0ef4482aceb854636f33f9cd319f9e1cd6fe3aa2e60523f3583c287b89382445"
+);
 
 export function handleBlocks(blocks: Block[]): Bytes {
   // init output state
   let state: Bytes;
 
-  // #1 can access all (matched) events of the latest block
   let events: Event[] = blocks[0].events;
+  let latestEvent: Event | null = null;
+  for (let i = 0; i < events.length; i++) {
+    if (events[i].esig == esig_countChanged && events[i].address == addr) {
+      latestEvent = events[i];
+      break;
+    }
+  }
+  if (latestEvent != null) {
+    let functionSelector = Bytes.fromHexString("0x040f0aee");
 
-  // #2 also can access (matched) events of a given account address (should present in yaml first).
-  // a subset of 'events'
-  let eventsByAcct: Event[] = blocks[0].account(addr).events;
-
-  // #3 also can access (matched) events of a given account address & a given esig  (should present in yaml first).
-  // a subset of 'eventsByAcct'
-  let eventsByAcctEsig: Event[] = blocks[0].account(addr).eventsByEsig(esig_sync)
-
-  // require match event count > 0
-  require(eventsByAcctEsig.length > 0)
-
-  // this 2 way to access event are equal effects, alway true when there's only 1 event matched in the block (e.g. block# 2279547 on sepolia).
-  require(
-    events[0].data == eventsByAcct[0].data 
-    && events[0].data == eventsByAcctEsig[0].data
-  );
-
-  // set state to the address of the 1st (matched) event, demo purpose only.
-  state = events[0].address;
-
-  return state
+    return functionSelector;
+  } else {
+    return Bytes.fromI32(0);
+  }
 }
